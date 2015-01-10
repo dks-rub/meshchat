@@ -81,7 +81,9 @@ public class MessageReceiver {
 		};
 		thread.start();
 	}
-
+	
+	
+	//TODO: change to queue to avoid message lost
 	public Message getMessage() {
 		return lastMsg;
 	}

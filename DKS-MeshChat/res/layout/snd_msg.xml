@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#07070707"
-    android:paddingTop="10dp" >
+    android:background="#07070707" >
 
     <View
         android:id="@+id/profil"
@@ -14,6 +13,7 @@
         android:layout_marginRight="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:background="#00AA00"/>
     
     <TextView

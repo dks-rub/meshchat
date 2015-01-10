@@ -15,6 +15,7 @@ public class Message implements Serializable, Comparable<Message> {
 	private String nickname;
 	private String date;
 	private int ID_color;
+	private boolean broadcast = false;
 
 	public Message(String text, String ID, String nickname, String date, int color) {
 		this.text = text;
@@ -22,6 +23,13 @@ public class Message implements Serializable, Comparable<Message> {
 		this.nickname = nickname;
 		this.date = date;
 		this.ID_color = color;
+	}
+	
+	public Message(String text, String date, int color){
+		this.date = date;
+		this.ID_color = color;
+		this.broadcast = true;
+		this.text = text;
 	}
 
 	public String getText() {
@@ -43,7 +51,15 @@ public class Message implements Serializable, Comparable<Message> {
 	public int getColor() {
 		return this.ID_color;
 	}
-
+	
+	public boolean isBroadcast() {
+		return this.broadcast;
+	}
+	
+	public void setBroadcast() {
+		this.broadcast = true;
+	}
+	
 	public byte[] serialize() {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {

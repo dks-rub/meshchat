@@ -20,7 +20,7 @@
             android:layout_gravity="fill_horizontal"
             android:layout_marginLeft="30dp"
             android:ems="10"
-            android:hint="Message..."
+            android:hint="@string/message_hint"
             android:inputType="textMultiLine" >
         </EditText>
 
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
-            android:text="Send" />
+            android:text="@string/send_btn" />
         
     </GridLayout>
     
@@ -45,19 +45,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-            
-<!--             <include  -->
-<!--             android:id="@+id/container" -->
-<!--             layout="@layout/msg_container"/> -->
-            
-<!--             <include  -->
-<!--                 android:id="@+id/send" -->
-<!--                 layout="@layout/snd_msg"/> -->
-            
-<!--             <include  -->
-<!--                 android:id="@+id/rec" -->
-<!--                 layout="@layout/rec_msg"/>" -->
-
         </LinearLayout>
 
     </ScrollView>
