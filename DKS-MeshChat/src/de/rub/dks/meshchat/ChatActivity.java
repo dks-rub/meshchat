@@ -26,6 +26,7 @@ import de.rub.dks.meshchat.IM.Message;
 import de.rub.dks.meshchat.IM.MessageReceiver;
 import de.rub.dks.meshchat.IM.MessageSender;
 import de.rub.dks.meshchat.account.Account;
+import de.rub.dks.meshchat.helper.UpdateHelper;
 
 public class ChatActivity extends Activity {
 
@@ -207,6 +208,11 @@ public class ChatActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		//super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
+		
+		//check updates
+		Handler mHandler = new Handler(Looper.getMainLooper());
+		UpdateHelper uh = new UpdateHelper(this, getString(R.string.app_name), mHandler);
+		uh.startThread();
 		
 		//List of all messages
 		messages = new ArrayList<Message>();

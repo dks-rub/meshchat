@@ -28,4 +28,10 @@
 <!--     <string name="settings_storage">Spericherort ändern</string> -->
 <!--     <string name="settings_multicast_address">Multicastadresse ändern</string> -->
 
+	<string name="alert_decline">Decline</string>
+    <string name="update_error">Update Server not found!</string>
+    <string name="update_needed">There is a newer version of this app available! Please Update!</string>
+    <string name="alert_update">Update</string>
+    <string name="update_title">Update available</string>
+
 </resources>
