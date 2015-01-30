@@ -180,7 +180,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		getActionBar().setTitle(chatroom);
 		// say hello in chatroom
 		Message m = new Message(nickname + getString(R.string.new_person), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
-		MessageContainer.getContainer().add(m);
+		MessageContainer.getContainer().add(new Message("You are now in the chatroom \"" + chatroom + "\"", this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color));
 		sender.sendMessage(m);
 		refreshMessages();
 	}
@@ -196,20 +196,6 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		chatroomList = new ChatroomList(this);
 		drawerList.setAdapter(chatroomList);
 		drawerList.setOnItemClickListener(this);
-
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
-
-		/*
-		 * setDrawerListener(new ActionBarDrawerToggle(this, this,
-		 * R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
-		 * public void onDrawerClosed(View view) {
-		 * getActionBar().setTitle(mTitle); supportInvalidateOptionsMenu(); }
-		 * 
-		 * public void onDrawerOpened(View drawerView) {
-		 * getActionBar().setTitle(R.string.app_name);
-		 * supportInvalidateOptionsMenu(); } });
-		 */
 
 		// check updates
 		Handler mHandler = new Handler(Looper.getMainLooper());
@@ -275,7 +261,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 				sender.sendMessage(m);
 			}
 		});
-		enterChatroom("Default");
+		// enterChatroom("Default");
 		super.onCreate(savedInstanceState);
 	}
 
