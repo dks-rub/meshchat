@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.text.format.Time;
 import android.util.Log;
@@ -173,6 +172,8 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 
 	public void enterChatroom(String newChatroom) {
 		if (chatroom != null) {
+			if (chatroom.equals(newChatroom))
+				return;
 			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
 			sender.sendMessage(m);
 		}
@@ -261,7 +262,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 				sender.sendMessage(m);
 			}
 		});
-		// enterChatroom("Default");
+		enterChatroom(ChatroomList.DEFAULT_CHAT_ROOM);
 		super.onCreate(savedInstanceState);
 	}
 

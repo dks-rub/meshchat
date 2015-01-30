@@ -11,6 +11,7 @@ import android.widget.TextView;
 import de.rub.dks.meshchat.R;
 
 public class ChatroomList extends BaseAdapter {
+	public static final String DEFAULT_CHAT_ROOM = "Default";
 	private Context context;
 	private ArrayList<String> rooms;
 	private LayoutInflater inflater;
@@ -18,6 +19,7 @@ public class ChatroomList extends BaseAdapter {
 	public ChatroomList(Context pContext) {
 		context = pContext;
 		rooms = new ArrayList<String>();
+		rooms.add(DEFAULT_CHAT_ROOM);
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
