@@ -28,9 +28,7 @@ public abstract class IM {
 	}
 	
 	public static Message popMessage(){
-		Message m = messageList.get(0);
-		messageList.remove(0);
-		return m;
+		return messageList.remove(0);
 	}
 
 	// Queue for Messaging

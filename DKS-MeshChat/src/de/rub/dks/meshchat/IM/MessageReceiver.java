@@ -3,6 +3,7 @@ package de.rub.dks.meshchat.IM;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.content.Context;
@@ -16,11 +17,12 @@ public class MessageReceiver {
 	private Thread thread;
 	private Runnable processRunnable;
 	private Handler handler;
-	private Message lastMsg;
+	private ArrayList<Message> msgQueue;
 	private Context context;
 
 	public MessageReceiver(Context context, Handler handler, Runnable onNewMessage) {
 		processRunnable = onNewMessage;
+		msgQueue = new ArrayList<Message>();
 		this.handler = handler;
 		this.context = context;
 	}
@@ -69,7 +71,7 @@ public class MessageReceiver {
 					Log.d("MessageReceiver", "Received Message! Processing...");
 					byte data[] = rPacket.getData();
 					try {
-						lastMsg = Message.deserialize(data);
+						msgQueue.add(Message.deserialize(data));
 					} catch (IllegalArgumentException ex) {
 						Log.d("MessageReceiver", "There was a problem processing the message " + Arrays.toString(data));
 						continue;
@@ -81,15 +83,19 @@ public class MessageReceiver {
 		};
 		thread.start();
 	}
-	
-	
-	//TODO: change to queue to avoid message lost
-	public Message getMessage() {
-		return lastMsg;
+
+	public Message[] getMessages() {
+		Message[] r = new Message[msgQueue.size()];
+		for (int i = 0; i < msgQueue.size(); ++i)
+			r[i] = msgQueue.get(i);
+		msgQueue.clear();
+		return r;
 	}
-	
-	public void receive(Message m){
-		lastMsg = m;
+
+	// Debug function for testing
+	public void receive(Message m) {
+		Log.d("MessageReceiver", "function receive called!!");
+		msgQueue.add(m);
 		handler.post(processRunnable);
 	}
 }
