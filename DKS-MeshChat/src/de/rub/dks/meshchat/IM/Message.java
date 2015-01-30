@@ -14,22 +14,26 @@ public class Message implements Serializable, Comparable<Message> {
 	private String ID;
 	private String nickname;
 	private String date;
+	private String chatroom;
 	private int ID_color;
 	private boolean broadcast = false;
 
-	public Message(String text, String ID, String nickname, String date, int color) {
+	public Message(String text, String ID, String nickname, String date, String chatroom, int color) {
 		this.text = text;
 		this.ID = ID;
 		this.nickname = nickname;
 		this.date = date;
 		this.ID_color = color;
+		this.chatroom = chatroom;
 	}
-	
-	public Message(String text, String date, int color){
+
+	public Message(String text, String ID, String date, String chatroom, int color) {
 		this.date = date;
+		this.ID = ID;
 		this.ID_color = color;
 		this.broadcast = true;
 		this.text = text;
+		this.chatroom = chatroom;
 	}
 
 	public String getText() {
@@ -48,18 +52,22 @@ public class Message implements Serializable, Comparable<Message> {
 		return this.date;
 	}
 
+	public String getChatroom() {
+		return this.chatroom;
+	}
+
 	public int getColor() {
 		return this.ID_color;
 	}
-	
+
 	public boolean isBroadcast() {
 		return this.broadcast;
 	}
-	
+
 	public void setBroadcast() {
 		this.broadcast = true;
 	}
-	
+
 	public byte[] serialize() {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -82,9 +90,10 @@ public class Message implements Serializable, Comparable<Message> {
 	}
 
 	public String toString() {
-		return nickname + "[" + ID + "]: " + text + " (" + date + ")";
+		return nickname + "[" + ID + "] at \"" + chatroom + "\": " + text + " (" + date + ")";
 	}
 
+	// comparable for sorting by date
 	public int compareTo(Message another) {
 		return date.compareTo(another.date);
 	}

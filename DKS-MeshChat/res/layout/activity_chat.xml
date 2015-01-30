@@ -1,52 +1,64 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="de.rub.dks.meshchat.ChatActivity" >
 
-    <GridLayout
-        android:id="@+id/control_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true" 
-        android:background="#0F0F0F0F">
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-       <EditText
-            android:id="@+id/chat_field"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_horizontal"
-            android:layout_marginLeft="30dp"
-            android:ems="10"
-            android:hint="@string/message_hint"
-            android:inputType="textMultiLine" >
-        </EditText>
-
-        <Button
-            android:id="@+id/send_bt"
+        <GridLayout
+            android:id="@+id/control_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="30dp"
-            android:text="@string/send_btn" />
-        
-    </GridLayout>
-    
-    <ScrollView
-        android:id="@+id/chat_container"
-        android:paddingBottom="1dp"
-        android:layout_above="@id/control_container"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+            android:background="#0F0F0F0F" >
 
-        <LinearLayout
-            android:id="@+id/msg_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-        </LinearLayout>
+            <EditText
+                android:id="@+id/chat_field"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal"
+                android:layout_marginLeft="30dp"
+                android:ems="10"
+                android:hint="@string/message_hint"
+                android:inputType="textMultiLine" >
+            </EditText>
 
-    </ScrollView>
-    
-</RelativeLayout>
+            <Button
+                android:id="@+id/send_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:text="@string/send_btn" />
+        </GridLayout>
+
+        <ScrollView
+            android:id="@+id/chat_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@id/control_container"
+            android:paddingBottom="1dp" >
+
+            <LinearLayout
+                android:id="@+id/msg_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#111"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
+
+</android.support.v4.widget.DrawerLayout>

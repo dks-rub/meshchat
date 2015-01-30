@@ -1,8 +1,5 @@
 package de.rub.dks.meshchat;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,18 +16,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import de.rub.dks.meshchat.IM.ChatroomList;
 import de.rub.dks.meshchat.IM.Message;
+import de.rub.dks.meshchat.IM.MessageContainer;
 import de.rub.dks.meshchat.IM.MessageReceiver;
 import de.rub.dks.meshchat.IM.MessageSender;
 import de.rub.dks.meshchat.account.Account;
 import de.rub.dks.meshchat.helper.UpdateHelper;
+import de.rub.dks.meshchat.notifications.MessageNotification;
 
-public class ChatActivity extends Activity {
+public class ChatActivity extends Activity implements ListView.OnItemClickListener {
 
 	// Persistent Settings
 	private SharedPreferences sPref;
@@ -39,23 +43,29 @@ public class ChatActivity extends Activity {
 	private String nickname = null;
 
 	// Shows if Activity is watched
-	// private boolean activity_active = true;
+	private boolean activity_active;
 
-	// Intents for notification
-	// private Intent intent = null;
-	// private PendingIntent pIntent = null;
+	// Drawer Layout
+	private DrawerLayout drawerLayout;
+	private ListView drawerList;
+	private ChatroomList chatroomList;
+	private String chatroom = "Test Room";
+
+	// Notification Service
+	private MessageNotification notification;
 
 	// Chat internals
 	private MessageReceiver receiver;
 	private MessageSender sender;
 	private EditText msg;
-	private ArrayList<Message> messages;
+
 	private Button snd_bt;
 	private Time time = new Time(Time.getCurrentTimezone());
 	private ScrollView chat;
 
 	// Init for checking whether the account is created or not
 	private void init(SharedPreferences.Editor editor) {
+		notification = new MessageNotification(ChatActivity.this);
 		// Account is not created
 		if (sPref.getBoolean(Globals.FIRST_STARTUP, true)) {
 			// Create the account
@@ -81,7 +91,6 @@ public class ChatActivity extends Activity {
 		} catch (Exception e) {
 			Log.d(Globals.TAG, e.toString());
 		}
-		return;
 	}
 
 	@Override
@@ -90,14 +99,14 @@ public class ChatActivity extends Activity {
 			if (data.hasExtra("nickname")) {
 				SharedPreferences.Editor editor = sPref.edit();
 
-				Message m = new Message(data.getExtras().getString("nickname") + getString(R.string.new_person), time.format("%d.%m.%y, %k:%M:%S"), ID_color);
+				Message m = new Message(data.getExtras().getString("nickname") + getString(R.string.new_person), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
 
 				editor.putString(Globals.NICKNAME_DATA, data.getExtras().getString("nickname"));
 				editor.commit();
 				init(editor);
 
 				// Broadcast new person is in the chat
-				messages.add(m);
+				MessageContainer.getContainer().add(m);
 				sender.sendMessage(m);
 			} else {
 				finish();
@@ -106,7 +115,7 @@ public class ChatActivity extends Activity {
 			if (data.hasExtra("nickname")) {
 				SharedPreferences.Editor editor = sPref.edit();
 
-				Message m = new Message(this.nickname + getString(R.string.change_nickname) + data.getExtras().getString("nickname"), time.format("%d.%m.%y, %k:%M:%S"), ID_color);
+				Message m = new Message(this.nickname + getString(R.string.change_nickname) + data.getExtras().getString("nickname"), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
 
 				editor.putString(Globals.NICKNAME_DATA, data.getExtras().getString("nickname"));
 				editor.putBoolean(Globals.FIRST_STARTUP, true);
@@ -114,7 +123,7 @@ public class ChatActivity extends Activity {
 				init(editor);
 
 				// Broadcast name change to chat
-				messages.add(m);
+				MessageContainer.getContainer().add(m);
 				sender.sendMessage(m);
 			}
 		} else if (resultCode == Globals.INIT_FAIL) {
@@ -150,49 +159,30 @@ public class ChatActivity extends Activity {
 
 	}
 
-	// TODO: Build a database for all messages stored, for persistent data sets
 	public void refreshMessages() {
-		LinearLayout msg_container = (LinearLayout) findViewById(R.id.msg_container);
-
-		// boolean check_read=false, check_write=false;
-		// StorageHelper<Message> storage = new
-		// StorageHelper<Message>(getApplicationContext());
-		//
-		// try {
-		// check_read = storage.read(Globals.CHAT_HISTORY_FN);
-		// } catch (StreamCorruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (ClassNotFoundException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		//
-		// try {
-		// check_write = storage.write(messages);
-		// } catch (IOException e1) {
-		// // TODO Auto-generated catch block
-		// e1.printStackTrace();
-		// }
-		//
-		// if(check_read && check_write){
-		// Log.d(Globals.TAG, "messages!");
-		// messages = storage.getList();
-		// }
-
-		if (messages.size() >= 2 && (messages.get(messages.size() - 1).compareTo(messages.get(messages.size() - 2)) < 0))
-			Collections.sort(messages);
-		msg_container.removeAllViews();
-		for (Message m : messages)
-			msg_container.addView(getMessageView(m));
+		LinearLayout msg_view_container = (LinearLayout) findViewById(R.id.msg_container);
+		msg_view_container.removeAllViews();
+		for (Message m : MessageContainer.getContainer().getMessages(chatroom))
+			msg_view_container.addView(getMessageView(m));
 		chat.post(new Runnable() {
 			public void run() {
 				chat.fullScroll(ScrollView.FOCUS_DOWN);
 			}
 		});
+	}
+
+	public void enterChatroom(String newChatroom) {
+		if (chatroom != null) {
+			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+			sender.sendMessage(m);
+		}
+		chatroom = newChatroom;
+		getActionBar().setTitle(chatroom);
+		// say hello in chatroom
+		Message m = new Message(nickname + getString(R.string.new_person), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+		MessageContainer.getContainer().add(m);
+		sender.sendMessage(m);
+		refreshMessages();
 	}
 
 	// Main window
@@ -201,19 +191,32 @@ public class ChatActivity extends Activity {
 		// super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
 
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerList = (ListView) findViewById(R.id.left_drawer);
+		chatroomList = new ChatroomList(this);
+		drawerList.setAdapter(chatroomList);
+		drawerList.setOnItemClickListener(this);
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
+
+		/*
+		 * setDrawerListener(new ActionBarDrawerToggle(this, this,
+		 * R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+		 * public void onDrawerClosed(View view) {
+		 * getActionBar().setTitle(mTitle); supportInvalidateOptionsMenu(); }
+		 * 
+		 * public void onDrawerOpened(View drawerView) {
+		 * getActionBar().setTitle(R.string.app_name);
+		 * supportInvalidateOptionsMenu(); } });
+		 */
+
 		// check updates
 		Handler mHandler = new Handler(Looper.getMainLooper());
 		UpdateHelper uh = new UpdateHelper(this, getString(R.string.app_name), mHandler);
 		uh.startThread();
 
-		// List of all messages
-		messages = new ArrayList<Message>();
-
 		Handler handler = new Handler(Looper.getMainLooper());
-
-		// Intents for notification
-		// intent = new Intent(this, ChatActivity.class);
-		// pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
 		// Receiver checks for new incoming messages
 		receiver = new MessageReceiver(getApplicationContext(), handler, new Runnable() {
@@ -225,26 +228,14 @@ public class ChatActivity extends Activity {
 						Log.d(Globals.TAG, "Dropped own message");
 						return;
 					}
-					messages.add(m);
+					MessageContainer.getContainer().add(m);
+					if (!activity_active && m.getNickname() != null)
+						notification.newMessage(m);
 					refreshMessages();
-
-					// Should notify the user, when a message arrives.
-					// TODO: Make sure that only triggered when window not
-					// active
-					// if(!activity_active){
-					// Notification noti = new
-					// Notification.Builder(getApplicationContext())
-					// .setContentTitle("Neue Nachricht von "+m.getNickname())
-					// .setContentText(m.getText()).setSmallIcon(R.drawable.ic_launcher).setContentIntent(pIntent).build();
-					// NotificationManager notificationManager =
-					// (NotificationManager)
-					// getSystemService(NOTIFICATION_SERVICE);
-					// // hide the notification after its selected
-					// noti.flags |= Notification.FLAG_AUTO_CANCEL;
-					//
-					// notificationManager.notify(0, noti);
-					// }
 				}
+				// Should notify the user, when a message arrives.
+				if (!activity_active)
+					notification.displayToUser(ChatActivity.this);
 			}
 		});
 		receiver.start();
@@ -265,7 +256,6 @@ public class ChatActivity extends Activity {
 		}
 		// Init or restore current profile settings
 		init(editor);
-
 		msg = (EditText) findViewById(R.id.chat_field);
 		snd_bt = (Button) findViewById(R.id.send_bt);
 		chat = (ScrollView) findViewById(R.id.chat_container);
@@ -277,14 +267,15 @@ public class ChatActivity extends Activity {
 				if (msg.getText().toString().trim().equals(""))
 					return;
 				time.setToNow();
-				Message m = new Message(msg.getText().toString().trim(), ID, nickname, time.format("%d.%m.%y, %k:%M:%S"), ID_color);
-				messages.add(m);
+				Message m = new Message(msg.getText().toString().trim(), ID, nickname, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+				MessageContainer.getContainer().add(m);
 				msg.setText("");
 				Log.d(Globals.TAG, "Sending: " + m.toString());
 				refreshMessages();
 				sender.sendMessage(m);
 			}
 		});
+		enterChatroom("Default");
 		super.onCreate(savedInstanceState);
 	}
 
@@ -326,11 +317,12 @@ public class ChatActivity extends Activity {
 	}
 
 	public void onResume() {
-		// activity_active = true;
+		activity_active = true;
 		// Message m = new Message(this.nickname+" is now in the chat.",
 		// time.format("%d.%m.%y, %k:%M:%S"), ID_color);
 		// sender.sendMessage(m);
 		super.onResume();
+		notification.reset();
 		runOnUiThread(new Runnable() {
 			public void run() {
 				refreshMessages();
@@ -340,7 +332,7 @@ public class ChatActivity extends Activity {
 	}
 
 	public void onPause() {
-		// activity_active = false;
+		activity_active = false;
 		// Message m = new Message(this.nickname+getString(R.string.leave),
 		// time.format("%d.%m.%y, %k:%M:%S"), ID_color);
 		// sender.sendMessage(m);
@@ -348,18 +340,27 @@ public class ChatActivity extends Activity {
 	}
 
 	public void finish() {
-		receiver.stop();
+		// receiver.stop(); finish calls onDestroy in the process
 		if (!sPref.getBoolean(Globals.FIRST_STARTUP, true)) {
-			Message m = new Message(this.nickname + getString(R.string.leave), time.format("%d.%m.%y, %k:%M:%S"), ID_color);
-			messages.add(m);
+			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
 			sender.sendMessage(m);
 		}
 		super.finish();
 	}
 
 	public void onDestroy() {
+		MessageContainer.getContainer().save();
 		receiver.stop();
-		// activity_active = false;
 		super.onDestroy();
 	}
+
+	@Override
+	// drawer listener to select chatroom
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		drawerList.setItemChecked(position, true);
+		String newChatroom = (String) chatroomList.getItem(position);
+		drawerLayout.closeDrawer(drawerList);
+		enterChatroom(newChatroom);
+	}
+
 }
