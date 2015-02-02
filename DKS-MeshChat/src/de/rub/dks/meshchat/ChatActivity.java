@@ -1,7 +1,9 @@
 package de.rub.dks.meshchat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -185,6 +187,30 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		sender.sendMessage(m);
 		refreshMessages();
 	}
+	
+	//Create a dialog to change chatrooms
+	public void onChatroomDialog(Context c) {
+		AlertDialog.Builder aDialogBuilder = new AlertDialog.Builder(c);
+		aDialogBuilder.setTitle("Creat Chatroom");
+		
+		final EditText input = new EditText(c);
+		aDialogBuilder.setView(input);
+		//Accept
+		aDialogBuilder.setMessage("Create a new Chatroom or join an exsisting one.").setPositiveButton("Create/Join", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				enterChatroom((input.getText()).toString());
+			}
+		//Decline
+		}).setNegativeButton("Cancle", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		AlertDialog aDialog = aDialogBuilder.create();
+		aDialog.show();
+	}
 
 	// Main window
 	@Override
@@ -298,6 +324,9 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 			return true;
 		} else if (id == R.id.action_leave) {
 			finish();
+			return true;
+		} else if (id == R.id.enter_chatroom){
+			onChatroomDialog(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

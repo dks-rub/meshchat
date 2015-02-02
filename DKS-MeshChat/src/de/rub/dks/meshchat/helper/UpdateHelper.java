@@ -104,8 +104,14 @@ public class UpdateHelper {
 						public void run() {
 							Log.d("error",appName);
 							if(!serverVersion.equals("error")){
-								double server_version = Double.parseDouble(serverVersion);
-								double current_version = Double.parseDouble(versionName);
+								double server_version = 0;
+								double current_version = 0;
+								try{
+									server_version = Double.parseDouble(serverVersion);
+									current_version = Double.parseDouble(versionName);
+								}catch(Exception e){
+									Log.d("Error", e.toString());
+								}
 								if(current_version < server_version){
 									//Open dialog for update
 									try {

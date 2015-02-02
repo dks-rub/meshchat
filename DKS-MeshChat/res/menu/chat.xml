@@ -18,4 +18,5 @@
         android:orderInCategory="100"
         android:showAsAction="ifRoom|withText"
         android:title="@string/action_leave"/>
+	<item android:id="@+id/enter_chatroom" android:title="@string/enter_chatroom"></item>
 </menu>
