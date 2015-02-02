@@ -20,6 +20,7 @@ public class ChatroomList extends BaseAdapter {
 		context = pContext;
 		rooms = new ArrayList<String>();
 		rooms.add(DEFAULT_CHAT_ROOM);
+		rooms.add("Test 2");
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -28,7 +29,7 @@ public class ChatroomList extends BaseAdapter {
 
 		TextView txtTitle = (TextView) itemView.findViewById(R.id.title);
 
-		txtTitle.setText(rooms.get(position));
+		txtTitle.setText("    "+rooms.get(position));
 
 		return itemView;
 	}

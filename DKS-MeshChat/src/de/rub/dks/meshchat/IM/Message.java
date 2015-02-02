@@ -27,13 +27,13 @@ public class Message implements Serializable, Comparable<Message> {
 		this.chatroom = chatroom;
 	}
 
-	public Message(String text, String ID, String date, String chatroom, int color) {
-		this.date = date;
+	public Message(String text, String ID, String chatroom, int color) {
 		this.ID = ID;
 		this.ID_color = color;
 		this.broadcast = true;
 		this.text = text;
 		this.chatroom = chatroom;
+		nickname = null;
 	}
 
 	public String getText() {

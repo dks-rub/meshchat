@@ -1,5 +1,7 @@
 package de.rub.dks.meshchat;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -56,6 +58,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 	private MessageNotification notification;
 
 	// Chat internals
+	private ArrayList<Message> visibleMessages;
 	private MessageReceiver receiver;
 	private MessageSender sender;
 	private EditText msg;
@@ -100,14 +103,14 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 			if (data.hasExtra("nickname")) {
 				SharedPreferences.Editor editor = sPref.edit();
 
-				Message m = new Message(data.getExtras().getString("nickname") + getString(R.string.new_person), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+				Message m = new Message(data.getExtras().getString("nickname") + getString(R.string.new_person), this.ID, chatroom, ID_color);
 
 				editor.putString(Globals.NICKNAME_DATA, data.getExtras().getString("nickname"));
 				editor.commit();
 				init(editor);
 
 				// Broadcast new person is in the chat
-				MessageContainer.getContainer().add(m);
+				visibleMessages.add(m);
 				sender.sendMessage(m);
 			} else {
 				finish();
@@ -116,7 +119,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 			if (data.hasExtra("nickname")) {
 				SharedPreferences.Editor editor = sPref.edit();
 
-				Message m = new Message(this.nickname + getString(R.string.change_nickname) + data.getExtras().getString("nickname"), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+				Message m = new Message(this.nickname + getString(R.string.change_nickname) + data.getExtras().getString("nickname"), this.ID, chatroom, ID_color);
 
 				editor.putString(Globals.NICKNAME_DATA, data.getExtras().getString("nickname"));
 				editor.putBoolean(Globals.FIRST_STARTUP, true);
@@ -124,7 +127,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 				init(editor);
 
 				// Broadcast name change to chat
-				MessageContainer.getContainer().add(m);
+				visibleMessages.add(m);
 				sender.sendMessage(m);
 			}
 		} else if (resultCode == Globals.INIT_FAIL) {
@@ -163,7 +166,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 	public void refreshMessages() {
 		LinearLayout msg_view_container = (LinearLayout) findViewById(R.id.msg_container);
 		msg_view_container.removeAllViews();
-		for (Message m : MessageContainer.getContainer().getMessages(chatroom))
+		for (Message m : visibleMessages)
 			msg_view_container.addView(getMessageView(m));
 		chat.post(new Runnable() {
 			public void run() {
@@ -176,15 +179,17 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		if (chatroom != null) {
 			if (chatroom.equals(newChatroom))
 				return;
-			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, chatroom, ID_color);
 			sender.sendMessage(m);
 		}
 		chatroom = newChatroom;
 		getActionBar().setTitle(chatroom);
+		visibleMessages.clear();
+		visibleMessages.addAll(MessageContainer.getContainer().getMessages(chatroom));
 		// say hello in chatroom
-		Message m = new Message(nickname + getString(R.string.new_person), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
-		MessageContainer.getContainer().add(new Message("You are now in the chatroom \"" + chatroom + "\"", this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color));
+		Message m = new Message(nickname + getString(R.string.new_person), this.ID, chatroom, ID_color);
 		sender.sendMessage(m);
+		visibleMessages.add(new Message("You are now in the chatroom \"" + chatroom + "\"", this.ID, chatroom, ID_color));
 		refreshMessages();
 	}
 	
@@ -224,6 +229,8 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		drawerList.setAdapter(chatroomList);
 		drawerList.setOnItemClickListener(this);
 
+		visibleMessages = new ArrayList<Message>();
+
 		// check updates
 		Handler mHandler = new Handler(Looper.getMainLooper());
 		UpdateHelper uh = new UpdateHelper(this, getString(R.string.app_name), mHandler);
@@ -241,9 +248,13 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 						Log.d(Globals.TAG, "Dropped own message");
 						return;
 					}
-					MessageContainer.getContainer().add(m);
-					if (!activity_active && m.getNickname() != null)
-						notification.newMessage(m);
+					if (m.getChatroom().equals(chatroom))
+						visibleMessages.add(m);
+					if (m.getNickname() != null) {
+						MessageContainer.getContainer().add(m);
+						if (!activity_active)
+							notification.newMessage(m);
+					}
 					refreshMessages();
 				}
 				// Should notify the user, when a message arrives.
@@ -282,6 +293,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 				time.setToNow();
 				Message m = new Message(msg.getText().toString().trim(), ID, nickname, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
 				MessageContainer.getContainer().add(m);
+				visibleMessages.add(m);
 				msg.setText("");
 				Log.d(Globals.TAG, "Sending: " + m.toString());
 				refreshMessages();
@@ -358,7 +370,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 	public void finish() {
 		// receiver.stop(); finish calls onDestroy in the process
 		if (!sPref.getBoolean(Globals.FIRST_STARTUP, true)) {
-			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, chatroom, ID_color);
 			sender.sendMessage(m);
 		}
 		super.finish();
