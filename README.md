@@ -1,10 +1,11 @@
 # DKS-MeshChat
 Der DKS-MeshChat soll ein Mesh Netzwerk Chat werden.
 
-## Import in Eclipse
-1. `git clone git@git.c0okies.com:dks/meshchat.git`
-2. `Import > Android > Existing Android Code Into Workspace`
-3. `Browse` das Repository komplett auswaehlen.
+## Import in Android Studio
+1. `git clone git@github.com:dks-rub/meshchat.git`
+2. `Open an exisiting Android Studio project`
+  3. Im Repo den Ordner `DKS-ForierAnalyzer` auswahelen.
+4. Android Studio schlaegt vor den `sdk`-Pfad zu aendern. Das kann an dem System liegen auf dem vorher entwickelt wurde.
 
 ## Lizenzen
 Bisher werden keine externen Bibliotheken verwendet.
