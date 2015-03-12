@@ -1,0 +1,67 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.rub.dks.meshchat.ChatActivity" >
+
+    <RelativeLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <GridLayout
+            android:id="@+id/control_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:background="#0F0F0F0F" >
+
+            <EditText
+                android:id="@+id/chat_field"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal"
+                android:layout_marginLeft="30dp"
+                android:ems="10"
+                android:hint="@string/message_hint"
+                android:inputType="textMultiLine" >
+            </EditText>
+
+            <Button
+                android:id="@+id/send_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:text="@string/send_btn" />
+        </GridLayout>
+
+        <ScrollView
+            android:id="@+id/chat_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@id/control_container"
+            android:paddingBottom="1dp" >
+
+            <LinearLayout
+                android:id="@+id/msg_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#1F1F1F"
+        android:choiceMode="singleChoice"
+        android:divider="#e3e3e3"
+        android:dividerHeight="0dp" />
+
+</android.support.v4.widget.DrawerLayout><!-- From: file:/C:/Users/desktop/Documents/git/DKS-MeshChat/app/src/main/res/layout/activity_chat.xml -->
