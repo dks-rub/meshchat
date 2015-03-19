@@ -29,7 +29,7 @@ public class Message implements Serializable, Comparable<Message> {
 	* @param nickname the account's nickname
 	* @param date a creation date
 	* @param chatroom the room this message was sent to
-	* @param the account's color
+	* @param color the account's color
 	*/
 	public Message(String text, String ID, String nickname, String date, String chatroom, int color) {
 		this.text = text;
@@ -40,6 +40,15 @@ public class Message implements Serializable, Comparable<Message> {
 		this.chatroom = chatroom;
 	}
 
+	/**
+	* Constructor.
+	* Creates a new message and sets some members.
+	* The message will be marked as a broadcasted message, thus lacking detailed account information.
+	* @param text the messages content
+	* @param ID the account id
+	* @param chatroom the room this message was sent to
+	* @param color the account's color
+	*/
 	public Message(String text, String ID, String chatroom, int color) {
 		this.ID = ID;
 		this.ID_color = color;
@@ -48,6 +57,46 @@ public class Message implements Serializable, Comparable<Message> {
 		this.chatroom = chatroom;
 		nickname = null;
 	}
+	
+	/**
+	* Returns the object's bytes
+	* @return data bytes of the object
+	*/
+	public byte[] serialize() {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			ObjectOutputStream os = new ObjectOutputStream(out);
+			os.writeObject(this);
+		} catch (IOException e) {
+		}
+		return out.toByteArray();
+	}
+
+	/**
+	* Creates a new object from data bytes
+	* @return the object or null if data was corrupted
+	*/
+	public static Message deserialize(byte[] data) {
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
+		ObjectInputStream is;
+		try {
+			is = new ObjectInputStream(in);
+			return (Message) is.readObject();
+		} catch (Exception e) {
+		}
+		return null;
+	}
+
+	public String toString() {
+		return nickname + "[" + ID + "] at \"" + chatroom + "\": " + text + " (" + date + ")";
+	}
+
+	// comparable for sorting by date
+	public int compareTo(Message another) {
+		return date.compareTo(another.date);
+	}
+	
+	// Getters and setters
 
 	public String getText() {
 		return this.text;
@@ -80,35 +129,4 @@ public class Message implements Serializable, Comparable<Message> {
 	public void setBroadcast() {
 		this.broadcast = true;
 	}
-
-	public byte[] serialize() {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			ObjectOutputStream os = new ObjectOutputStream(out);
-			os.writeObject(this);
-		} catch (IOException e) {
-		}
-		return out.toByteArray();
-	}
-
-	public static Message deserialize(byte[] data) {
-		ByteArrayInputStream in = new ByteArrayInputStream(data);
-		ObjectInputStream is;
-		try {
-			is = new ObjectInputStream(in);
-			return (Message) is.readObject();
-		} catch (Exception e) {
-		}
-		return null;
-	}
-
-	public String toString() {
-		return nickname + "[" + ID + "] at \"" + chatroom + "\": " + text + " (" + date + ")";
-	}
-
-	// comparable for sorting by date
-	public int compareTo(Message another) {
-		return date.compareTo(another.date);
-	}
-
 }
