@@ -13,8 +13,10 @@ import android.os.Environment;
 import android.util.Log;
 import de.rub.dks.meshchat.Globals;
 
+/**
+* Generic class for easy list<->filesystem transfer
+*/
 public class StorageHelper<h>{
-	
 	private String state = null;
 	private ArrayList<h> list = null;
 	private Context context = null;
@@ -24,7 +26,10 @@ public class StorageHelper<h>{
 		this.context = c;
 	}
 	
-	//Save ArrayList to external Storage
+	/**
+	* Save ArrayList to external Storage
+	* @return success state
+	*/
 	public boolean write(ArrayList<h> element) throws IOException{
 		this.state = Environment.getExternalStorageState();
 		//Only readable
@@ -50,7 +55,11 @@ public class StorageHelper<h>{
 		}
 	}
 	
-	//Read and reset ArrayList to list
+	/**
+	* Read ArrayList to list member.
+	* Use getList() to access the read list.
+	* @return success state
+	*/
 	public boolean read(String filename) throws StreamCorruptedException, IOException, ClassNotFoundException{
 		this.state = Environment.getExternalStorageState();
 		//Only readable
