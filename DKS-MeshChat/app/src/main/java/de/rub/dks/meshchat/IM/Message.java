@@ -7,6 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+/**
+* Basic message class, messages will be sent from device to device.
+*/
 public class Message implements Serializable, Comparable<Message> {
 	private static final long serialVersionUID = 957528886230338376L;
 
@@ -18,6 +21,16 @@ public class Message implements Serializable, Comparable<Message> {
 	private int ID_color;
 	private boolean broadcast = false;
 
+	/**
+	* Constructor.
+	* Creates a new message and sets all members
+	* @param text the messages content
+	* @param ID the account id
+	* @param nickname the account's nickname
+	* @param date a creation date
+	* @param chatroom the room this message was sent to
+	* @param the account's color
+	*/
 	public Message(String text, String ID, String nickname, String date, String chatroom, int color) {
 		this.text = text;
 		this.ID = ID;
