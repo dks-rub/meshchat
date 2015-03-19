@@ -13,6 +13,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import de.rub.dks.meshchat.R;
 
+/**
+ * DEPRECATED
+ * 
+ * do not use
+ */
+
 public abstract class IM {
 	
 	private static ArrayList<Message> messageList = new ArrayList<Message>();
