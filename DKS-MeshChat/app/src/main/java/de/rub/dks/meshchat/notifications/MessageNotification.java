@@ -12,6 +12,9 @@ import de.rub.dks.meshchat.ChatActivity;
 import de.rub.dks.meshchat.R;
 import de.rub.dks.meshchat.IM.Message;
 
+/**
+* A helper class to easily display notifications
+*/
 public class MessageNotification {
 	private String title, text;
 	private int count;
@@ -20,6 +23,10 @@ public class MessageNotification {
 	private NotificationCompat.Builder builder;
 	private static final int NOTIFICATION_ID = 1;
 
+	/**
+	* Constructor.
+	* Create a single instance and reset it, no need to create more.
+	*/
 	public MessageNotification(ChatActivity chatActivity) {
 		context = chatActivity;
 		notificationManager = (NotificationManager) context.getSystemService(ChatActivity.NOTIFICATION_SERVICE);
@@ -31,6 +38,10 @@ public class MessageNotification {
 		builder.setLights(Color.BLUE, 500, 500);
 	}
 
+	/**
+	* Updates the notification's text internally.
+	* Use displayToUser(context) to show/update the notification for the user
+	*/
 	public void newMessage(Message m) {
 		count++;
 		if (count == 1) {
@@ -42,10 +53,18 @@ public class MessageNotification {
 		}
 	}
 
+	/**
+	* Resets the notification count
+	*/
 	public void reset() {
 		count = 0;
 	}
 
+	/**
+	* Shows a new notification or updates an existing.
+	* This requires some power, so use it AFTER loops.
+	* @param context the current activity
+	*/
 	public void displayToUser(Context context) {
 		if (count == 0)
 			return;
