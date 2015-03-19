@@ -6,11 +6,18 @@ import java.util.Random;
 import android.text.format.Time;
 import android.util.Log;
 
+/**
+* Class for account generation.
+*/
 public abstract class Account {
 	
 	private static int ID_color = 0;
 	private static String ID = null;
 	
+	/**
+	* Setup method.
+	* Generates a random ID and Color for the user.
+	*/
 	public static void createAccount(){
 		Time time = new Time(Time.getCurrentTimezone());
 		time.setToNow();
@@ -34,6 +41,8 @@ public abstract class Account {
 		}
 		return;
 	}
+	
+	// Getters and Setters
 	
 	public static int getColor(){
 		return ID_color;
