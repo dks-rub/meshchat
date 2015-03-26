@@ -307,19 +307,23 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		snd_bt = (Button) findViewById(R.id.send_bt);
 		chat = (ScrollView) findViewById(R.id.chat_container);
 
+		// Send mechanic
 		snd_bt.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
+				// no empty messages
 				if (msg.getText().toString().trim().equals(""))
 					return;
 				time.setToNow();
+				// create message object
 				Message m = new Message(msg.getText().toString().trim(), ID, nickname, time.format("%d.%m.%y, %k:%M:%S"), chatroom, ID_color);
+				// insert message into own container
 				MessageContainer.getContainer().add(m);
 				visibleMessages.add(m);
 				msg.setText("");
 				Log.d(Globals.TAG, "Sending: " + m.toString());
 				refreshMessages();
+				// send message into the network
 				sender.sendMessage(m);
 			}
 		});
@@ -369,9 +373,6 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 
 	public void onResume() {
 		activity_active = true;
-		// Message m = new Message(this.nickname+" is now in the chat.",
-		// time.format("%d.%m.%y, %k:%M:%S"), ID_color);
-		// sender.sendMessage(m);
 		super.onResume();
 		notification.reset();
 		runOnUiThread(new Runnable() {
@@ -384,9 +385,6 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 
 	public void onPause() {
 		activity_active = false;
-		// Message m = new Message(this.nickname+getString(R.string.leave),
-		// time.format("%d.%m.%y, %k:%M:%S"), ID_color);
-		// sender.sendMessage(m);
 		super.onPause();
 	}
 
