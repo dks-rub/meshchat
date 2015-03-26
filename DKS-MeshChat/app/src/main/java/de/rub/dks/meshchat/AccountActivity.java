@@ -10,6 +10,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * Wrapping activity for account management. 
+ */
 public class AccountActivity extends Activity{
 	
 	private Button account_btn;
@@ -33,28 +36,22 @@ public class AccountActivity extends Activity{
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				if(s.length()>0){
-					account_btn.setEnabled(true);
-				} else {
-					account_btn.setEnabled(false);
-				}
+				account_btn.setEnabled(s.length()>0);
 			}
 		});
 		
 		account_btn.setOnClickListener(new OnClickListener() {
-			
 			public void onClick(View v) {
-				n = nickname.getText().toString();
-				finish();
+				finish(nickname.getText().toString());
 			}
 		});
 	}
 	
-	public void finish(){
+	public void finish(String name){
 		//sending back result to calling activity
 		Intent data = new Intent();
-		if(n != null){
-			data.putExtra("nickname",n);
+		if(name != null){
+			data.putExtra("nickname",name);
 			setResult(Globals.INIT_SUCCESS,data);
 		} else {
 			setResult(Globals.INIT_FAIL,data);
