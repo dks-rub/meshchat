@@ -10,8 +10,11 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
+
+/**
+ * Activity to edit settings like nickname etc.
+ */
 public class SettingsActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener{
-	
 	private SharedPreferences sPref;
 	private OnPreferenceChangeListener nicklistener;
 	private EditTextPreference p;
@@ -62,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		SharedPreferences.Editor editor = sharedPreferences.edit();
-		
+		// update on nickname change
 		if(key.equals(Globals.NICKNAME_DATA)){
 			EditTextPreference p = (EditTextPreference) findPreference(Globals.NICKNAME_DATA);
 			String nickname = p.getText();
