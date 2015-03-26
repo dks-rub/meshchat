@@ -35,6 +35,9 @@ import de.rub.dks.meshchat.account.Account;
 import de.rub.dks.meshchat.helper.UpdateHelper;
 import de.rub.dks.meshchat.notifications.MessageNotification;
 
+/**
+ * Chat activity, showing the actual chats and the chatroom-switcher.
+ */
 public class ChatActivity extends Activity implements ListView.OnItemClickListener {
 
 	// Persistent Settings
@@ -88,7 +91,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		editor.putString(Globals.NICKNAME_DATA, nickname);
 		editor.putInt(Globals.ID_COLOR_DATA, ID_color);
 		editor.commit();
-
+		// apply personal color
 		try {
 			findViewById(R.id.profil).setBackgroundColor(ID_color);
 			((TextView) findViewById(R.id.nickname)).setText(nickname);
@@ -99,6 +102,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// initiation successfull
 		if (resultCode == Globals.INIT_SUCCESS && requestCode == Globals.FIRST_INIT) {
 			if (data.hasExtra("nickname")) {
 				SharedPreferences.Editor editor = sPref.edit();
@@ -115,6 +119,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 			} else {
 				finish();
 			}
+		// name change successfull 
 		} else if (resultCode == Globals.INIT_SUCCESS && requestCode == Globals.RE_INIT) {
 			if (data.hasExtra("nickname")) {
 				SharedPreferences.Editor editor = sPref.edit();
@@ -130,39 +135,46 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 				visibleMessages.add(m);
 				sender.sendMessage(m);
 			}
+		// initiation failed
 		} else if (resultCode == Globals.INIT_FAIL) {
 			Log.d(Globals.TAG, Globals.INIT_FAIL + ": Intent failed");
 		}
 	}
 
+	/**
+	 * Generates a new view for a message to be displayed in the list.
+	 * @param m the message to be displayed
+	 */
 	private View getMessageView(Message m) {
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		// Creates different views, for own and received messages
+		// Creates different views, depending on message types
 		View layout_msg = null;
+		
+		// Broadcasted system message
 		if (m.isBroadcast()) {
 			layout_msg = inflater.inflate(R.layout.brc_msg, null);
 			layout_msg.findViewById(R.id.brc_container).setBackgroundColor(m.getColor());
 			((TextView) layout_msg.findViewById(R.id.brc_message)).setText(m.getText());
 			return layout_msg;
 		}
-
-		if (m.getID().equals(ID)) {
+		
+		// User-typed message
+		if (m.getID().equals(ID))
 			layout_msg = inflater.inflate(R.layout.snd_msg, null);
-		} else {
+		else
 			layout_msg = inflater.inflate(R.layout.rec_msg, null);
-		}
 		// Adding content to the view
 		layout_msg.findViewById(R.id.profil).setBackgroundColor(m.getColor());
 		((TextView) layout_msg.findViewById(R.id.nickname)).setText(m.getNickname());
 		((TextView) layout_msg.findViewById(R.id.text)).setText(m.getText());
 		((TextView) layout_msg.findViewById(R.id.date)).setText(m.getDate());
-
-		// Adding next message and scroll down
 		return layout_msg;
-
 	}
 
+	/**
+	 * refreshes the visible message list and fully scrolls it
+	 */
 	public void refreshMessages() {
 		LinearLayout msg_view_container = (LinearLayout) findViewById(R.id.msg_container);
 		msg_view_container.removeAllViews();
@@ -175,13 +187,19 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		});
 	}
 
+	/**
+	 * switches to the given chatroom.
+	 * a chatroom technically only exists if messages were sent, the string itself can be anything
+	 * @param newChatroom name of the new chatroom (must not be null)
+	 */
 	public void enterChatroom(String newChatroom) {
 		if (chatroom != null) {
 			if (chatroom.equals(newChatroom))
 				return;
+				// leave message
 			Message m = new Message(this.nickname + getString(R.string.leave), this.ID, chatroom, ID_color);
 			sender.sendMessage(m);
-		}
+		}else return;
 		chatroom = newChatroom;
 		getActionBar().setTitle(chatroom);
 		visibleMessages.clear();
@@ -189,6 +207,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		// say hello in chatroom
 		Message m = new Message(nickname + getString(R.string.new_person), this.ID, chatroom, ID_color);
 		sender.sendMessage(m);
+		// display success to user
 		visibleMessages.add(new Message("You are now in the chatroom \"" + chatroom + "\"", this.ID, chatroom, ID_color));
 		refreshMessages();
 	}
@@ -223,6 +242,7 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 		// super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chat);
 
+		// initiate drawer to switch between chatrooms
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawerList = (ListView) findViewById(R.id.left_drawer);
 		chatroomList = new ChatroomList(this);
@@ -244,12 +264,15 @@ public class ChatActivity extends Activity implements ListView.OnItemClickListen
 				Message[] newMessages = receiver.getMessages();
 				for (Message m : newMessages) {
 					Log.d(Globals.TAG, "Received: " + m.toString());
+					// own messages (received because of broadcast) are ignored
 					if (ID.equals(m.getID())) {
 						Log.d(Globals.TAG, "Dropped own message");
 						return;
 					}
+					// new valid message received which is sent in the current chatroom
 					if (m.getChatroom().equals(chatroom))
 						visibleMessages.add(m);
+					// if the message was not a system message, store it persistently
 					if (m.getNickname() != null) {
 						MessageContainer.getContainer().add(m);
 						if (!activity_active)
